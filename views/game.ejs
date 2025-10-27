@@ -7,7 +7,21 @@
     <link rel="stylesheet" href="/css/theme.css">
 </head>
 <body>
-    <h1>Game Page</h1>
+    <h1>Game</h1>
+
+
+
+
     <script src="/js/theme.js"></script>
 </body>
+
+<script>
+    const socket = io();
+
+    socket.emit('playerJoined', { playerName: 'Player1' });
+
+    socket.on('startGame', (data) => {
+        console.log('Game is starting:', data);
+    });
+</script>
 </html>
