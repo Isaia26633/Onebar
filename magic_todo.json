@@ -1,0 +1,438 @@
+[
+    {
+        "id": 1761655879233,
+        "parentId": null,
+        "text": "Create the game setup and user interface",
+        "timestamp": 1761655882884,
+        "category": "💻"
+    },
+    {
+        "id": 1761656045852,
+        "parentId": 1761655879233,
+        "text": "Design the layout of the game screen",
+        "isCompleted": false,
+        "timestamp": 1761657792779
+    },
+    {
+        "id": 1761656045853,
+        "parentId": 1761655879233,
+        "text": "Plan the placement of game elements and controls",
+        "isCompleted": false,
+        "timestamp": 1761657792019
+    },
+    {
+        "id": 1761656045854,
+        "parentId": 1761655879233,
+        "text": "Create visual assets for the interface components",
+        "isCompleted": false,
+        "timestamp": 1761657791267
+    },
+    {
+        "id": 1761656045855,
+        "parentId": 1761655879233,
+        "text": "Implement the game background and environment",
+        "timestamp": 1761656045851
+    },
+    {
+        "id": 1761656045856,
+        "parentId": 1761655879233,
+        "text": "Add buttons and interactive elements for user input",
+        "timestamp": 1761656045851
+    },
+    {
+        "id": 1761656045857,
+        "parentId": 1761655879233,
+        "text": "Configure menus and game start screens",
+        "timestamp": 1761656045851
+    },
+    {
+        "id": 1761656045858,
+        "parentId": 1761655879233,
+        "text": "Apply styling and visual effects to interface elements",
+        "timestamp": 1761656045851
+    },
+    {
+        "id": 1761656045859,
+        "parentId": 1761655879233,
+        "text": "Test the interface layout for usability and clarity",
+        "timestamp": 1761656045851
+    },
+    {
+        "id": 1761655879232,
+        "parentId": null,
+        "text": "Implement player connection and lobby creation",
+        "timestamp": 1761655883320,
+        "category": "💻"
+    },
+    {
+        "id": 1761656106808,
+        "parentId": 1761655879232,
+        "text": "Establish a server to handle incoming player connections",
+        "timestamp": 1761656106807
+    },
+    {
+        "id": 1761656106809,
+        "parentId": 1761655879232,
+        "text": "Create a method for players to connect to the server",
+        "timestamp": 1761656106807
+    },
+    {
+        "id": 1761656106810,
+        "parentId": 1761655879232,
+        "text": "Implement a handshake or authentication process for new connections",
+        "timestamp": 1761656106807
+    },
+    {
+        "id": 1761656106811,
+        "parentId": 1761655879232,
+        "text": "Develop a system to detect when players join or leave",
+        "timestamp": 1761656106807
+    },
+    {
+        "id": 1761656106812,
+        "parentId": 1761655879232,
+        "text": "Create a lobby creation feature that players can initiate",
+        "timestamp": 1761656106807
+    },
+    {
+        "id": 1761656106813,
+        "parentId": 1761655879232,
+        "text": "Set up a way for players to specify lobby details (e.g., name, max players)",
+        "timestamp": 1761656106807
+    },
+    {
+        "id": 1761656106814,
+        "parentId": 1761655879232,
+        "text": "Store lobby information in a data structure accessible to the server",
+        "timestamp": 1761656106807
+    },
+    {
+        "id": 1761656106815,
+        "parentId": 1761655879232,
+        "text": "Allow players to join existing lobbies or create new ones",
+        "timestamp": 1761656106807
+    },
+    {
+        "id": 1761656106816,
+        "parentId": 1761655879232,
+        "text": "Update lobby status when players join or leave",
+        "timestamp": 1761656106807
+    },
+    {
+        "id": 1761656106817,
+        "parentId": 1761655879232,
+        "text": "Notify players of lobby updates and connection statuses",
+        "timestamp": 1761656106807
+    },
+    {
+        "id": 1761655879231,
+        "parentId": null,
+        "text": "Generate and manage unique game room codes",
+        "timestamp": 1761655883551,
+        "category": "💻"
+    },
+    {
+        "id": 1761656105710,
+        "parentId": 1761655879231,
+        "text": "Create a function to generate a random code with a fixed length",
+        "timestamp": 1761656105709
+    },
+    {
+        "id": 1761656105711,
+        "parentId": 1761655879231,
+        "text": "Ensure the code is unique by checking it against existing room codes",
+        "timestamp": 1761656105709
+    },
+    {
+        "id": 1761656105712,
+        "parentId": 1761655879231,
+        "text": "Store the generated code in a database or data structure that tracks active room codes",
+        "timestamp": 1761656105709
+    },
+    {
+        "id": 1761656105713,
+        "parentId": 1761655879231,
+        "text": "Implement a system to validate the code when a user tries to join a game room",
+        "timestamp": 1761656105709
+    },
+    {
+        "id": 1761656105714,
+        "parentId": 1761655879231,
+        "text": "Provide a way to delete or mark a code as invalid when the game room is closed",
+        "timestamp": 1761656105709
+    },
+    {
+        "id": 1761655879230,
+        "parentId": null,
+        "text": "Allow players to join existing game rooms",
+        "timestamp": 1761655882890,
+        "category": "🎮"
+    },
+    {
+        "id": 1761656081924,
+        "parentId": 1761655879230,
+        "text": "Identify the existing game rooms that players can join",
+        "timestamp": 1761656081923
+    },
+    {
+        "id": 1761656081925,
+        "parentId": 1761655879230,
+        "text": "Create a user interface element for players to see available game rooms",
+        "timestamp": 1761656081923
+    },
+    {
+        "id": 1761656081926,
+        "parentId": 1761655879230,
+        "text": "Implement functionality to display the list of available game rooms to players",
+        "timestamp": 1761656081923
+    },
+    {
+        "id": 1761656081927,
+        "parentId": 1761655879230,
+        "text": "Allow players to select a game room from the list",
+        "timestamp": 1761656081923
+    },
+    {
+        "id": 1761656081928,
+        "parentId": 1761655879230,
+        "text": "Validate that the selected game room exists and is joinable",
+        "timestamp": 1761656081923
+    },
+    {
+        "id": 1761656081929,
+        "parentId": 1761655879230,
+        "text": "Add logic for the player to send a join request to the selected game room",
+        "timestamp": 1761656081923
+    },
+    {
+        "id": 1761656081930,
+        "parentId": 1761655879230,
+        "text": "Update the game room data to include the new player",
+        "timestamp": 1761656081923
+    },
+    {
+        "id": 1761656081931,
+        "parentId": 1761655879230,
+        "text": "Notify the other players in the game room about the new joiner",
+        "timestamp": 1761656081923
+    },
+    {
+        "id": 1761656081932,
+        "parentId": 1761655879230,
+        "text": "Confirm to the player that they have successfully joined the game room",
+        "timestamp": 1761656081923
+    },
+    {
+        "id": 1761655879229,
+        "parentId": null,
+        "text": "Start the game when all players are ready and set the initial cards for each player",
+        "isCompleted": false,
+        "timestamp": 1761656161275,
+        "category": "🎮"
+    },
+    {
+        "id": 1761655879227,
+        "parentId": null,
+        "text": "Handle card play actions with socket.io event listeners",
+        "timestamp": 1761655884278,
+        "category": "💻"
+    },
+    {
+        "id": 1761656174000,
+        "parentId": 1761655879227,
+        "text": "Establish a socket.io connection between the client and server",
+        "timestamp": 1761656173999
+    },
+    {
+        "id": 1761656174001,
+        "parentId": 1761655879227,
+        "text": "Set up event listeners for card play actions on the socket connection",
+        "timestamp": 1761656173999
+    },
+    {
+        "id": 1761656174002,
+        "parentId": 1761655879227,
+        "text": "Define a callback function to handle incoming card play events",
+        "timestamp": 1761656173999
+    },
+    {
+        "id": 1761656174003,
+        "parentId": 1761655879227,
+        "text": "Update the game state or UI to reflect the played card upon receiving the event",
+        "timestamp": 1761656173999
+    },
+    {
+        "id": 1761656174004,
+        "parentId": 1761655879227,
+        "text": "Send an event to notify other players about the card play action",
+        "timestamp": 1761656173999
+    },
+    {
+        "id": 1761656174005,
+        "parentId": 1761655879227,
+        "text": "Ensure proper disconnection handling and error management for socket events",
+        "timestamp": 1761656173999
+    },
+    {
+        "id": 1761655879226,
+        "parentId": null,
+        "text": "Validate card plays (game started, correct room, player's turn, card ownership)",
+        "timestamp": 1761655884284,
+        "category": "🎮"
+    },
+    {
+        "id": 1761656193478,
+        "parentId": 1761655879226,
+        "text": "Check if the game has started",
+        "timestamp": 1761656193477
+    },
+    {
+        "id": 1761656193479,
+        "parentId": 1761655879226,
+        "text": "Verify the player is in the correct room",
+        "timestamp": 1761656193477
+    },
+    {
+        "id": 1761656193480,
+        "parentId": 1761655879226,
+        "text": "Confirm it is the player's turn",
+        "timestamp": 1761656193477
+    },
+    {
+        "id": 1761656193481,
+        "parentId": 1761655879226,
+        "text": "Ensure the player owns the card they want to play",
+        "timestamp": 1761656193478
+    },
+    {
+        "id": 1761655879225,
+        "parentId": null,
+        "text": "Update game state by adding cards to discard pile and removing from players' hands",
+        "timestamp": 1761655884822,
+        "category": "🎮"
+    },
+    {
+        "id": 1761657641638,
+        "parentId": 1761655879225,
+        "text": "Identify the cards to be added to the discard pile",
+        "timestamp": 1761657641637
+    },
+    {
+        "id": 1761657641639,
+        "parentId": 1761655879225,
+        "text": "Remove the selected cards from each player's hand",
+        "timestamp": 1761657641637
+    },
+    {
+        "id": 1761657641640,
+        "parentId": 1761655879225,
+        "text": "Add the identified cards to the discard pile",
+        "timestamp": 1761657641637
+    },
+    {
+        "id": 1761657641641,
+        "parentId": 1761655879225,
+        "text": "Update the game state to reflect the changes in players' hands and discard pile",
+        "timestamp": 1761657641637
+    },
+    {
+        "id": 1761655879224,
+        "parentId": null,
+        "text": "Apply card effects and manage turn progression",
+        "timestamp": 1761655884705,
+        "category": "🎮"
+    },
+    {
+        "id": 1761656208109,
+        "parentId": 1761655879224,
+        "text": "Determine the active player's card effects to apply",
+        "timestamp": 1761656208108
+    },
+    {
+        "id": 1761656208110,
+        "parentId": 1761655879224,
+        "text": "Apply the effects of the active player's cards to the game state",
+        "timestamp": 1761656208108
+    },
+    {
+        "id": 1761656208111,
+        "parentId": 1761655879224,
+        "text": "Check for any resulting changes or triggers from the applied effects",
+        "timestamp": 1761656208108
+    },
+    {
+        "id": 1761656208112,
+        "parentId": 1761655879224,
+        "text": "Update the game state accordingly based on the applied effects",
+        "timestamp": 1761656208108
+    },
+    {
+        "id": 1761656208113,
+        "parentId": 1761655879224,
+        "text": "Advance to the next player's turn or phase as appropriate",
+        "timestamp": 1761656208108
+    },
+    {
+        "id": 1761656208114,
+        "parentId": 1761655879224,
+        "text": "Notify players of the turn progression and any new conditions or effects",
+        "timestamp": 1761656208108
+    },
+    {
+        "id": 1761655879223,
+        "parentId": null,
+        "text": "Implement UNO button functionality for players with one card and detect violations to assign penalty cards",
+        "timestamp": 1761655885187,
+        "category": "💻"
+    },
+    {
+        "id": 1761655879221,
+        "parentId": null,
+        "text": "Determine and display the winner when a player has no remaining cards",
+        "timestamp": 1761655886042,
+        "category": "🎮"
+    },
+    {
+        "id": 1761656239907,
+        "parentId": 1761655879221,
+        "text": "Check if the player has no remaining cards",
+        "timestamp": 1761656239906
+    },
+    {
+        "id": 1761656239908,
+        "parentId": 1761655879221,
+        "text": "Identify the current player in the game",
+        "timestamp": 1761656239906
+    },
+    {
+        "id": 1761656239909,
+        "parentId": 1761655879221,
+        "text": "Verify if the current player’s card count is zero",
+        "timestamp": 1761656239906
+    },
+    {
+        "id": 1761656239910,
+        "parentId": 1761655879221,
+        "text": "If the player has no remaining cards, declare the player as the winner",
+        "timestamp": 1761656239906
+    },
+    {
+        "id": 1761656239911,
+        "parentId": 1761655879221,
+        "text": "Display a message indicating the winner's name or identification",
+        "timestamp": 1761656239906
+    },
+    {
+        "id": 1761657368754,
+        "parentId": 1761655879221,
+        "text": "Prompt players to play another game after a round",
+        "timestamp": 1761657368754
+    },
+    {
+        "id": 1761655879219,
+        "parentId": null,
+        "text": "Integrate digital tokens (digipogs) for in-game currency transactions before gameplay",
+        "timestamp": 1761655886379,
+        "category": "💰"
+    }
+]
