@@ -5,23 +5,122 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Onebar - Game</title>
     <link rel="stylesheet" href="/css/theme.css">
+    <style>
+        #hand img {
+            width: 100px;
+            margin: 5px;
+            cursor: pointer;
+        }
+        #table img {
+            width: 120px;
+            margin: 5px;
+        }
+        #playerList {
+            margin-bottom: 10px;
+        }
+        .current {
+            font-weight: bold;
+        }
+    </style>
 </head>
 <body>
     <h1>Game</h1>
 
+    <div id="playerList"></div>
+    <div id="status"></div>
 
+    <h3>Your Hand</h3>
+    <div id="hand"></div>
 
+    <h3>Table</h3>
+    <div id="table"></div>
 
+    <script src="/socket.io/socket.io.js"></script>
     <script src="/js/theme.js"></script>
 </body>
-
 <script>
     const socket = io();
 
-    socket.emit('playerJoined', { playerName: 'Player1' });
+    const playerName = prompt('Enter your name', 'Player') || 'Player';
 
-    socket.on('startGame', (data) => {
-        console.log('Game is starting:', data);
+    socket.emit('joinGame', { playerName, gameId: 'default' });
+
+    socket.on('joined', ({ playerId, gameId }) => {
+        console.log('joined', playerId, gameId);
+        document.getElementById('status').innerText = `Joined game ${gameId} as ${playerName}`;
     });
+
+    socket.on('playerList', (players) => {
+        const el = document.getElementById('playerList');
+        el.innerHTML = 'Players:' + players.map(p => `<span id="p_${p.id}">${p.name}</span>`).join(' | ');
+    });
+    socket.on('deal', (hand) => {
+        renderHand(hand);
+        console.log('received deal', hand);
+    });
+    
+    socket.on('gameStarted', ({currentPlayerId, players}) => {
+        updateCurrentPlayer(currentPlayerId);
+    });
+
+    socket.on('turnChanged', ({ currentPlayerId }) => {
+        updateCurrentPlayer(currentPlayerId);
+    });
+
+    socket.on('cardPlayed', ({ playerId, card }) => {
+        addCardToTable(card, playerId);
+        removeCardFromHand(card.id);
+    });
+
+    socket.on('invalidMove', ({ reason }) => {
+        alert('Invalid move: ' + reason);
+    });
+
+    function renderHand(hand) {
+      const container = document.getElementById('hand');
+      container.innerHTML = '';
+      hand.forEach(card => {
+        const img = document.createElement('img');
+        img.src = card.img;
+        img.alt = card.name;
+        img.dataset.cardId = card.id;
+        img.title = `${card.name} (value ${card.value})`;
+        img.addEventListener('click', () => {
+          // play the card
+          socket.emit('playCard', { gameId: 'default', cardId: card.id });
+        });
+        container.appendChild(img);
+      });
+    }
+
+    function addCardToTable(card, playerId) {
+      const table = document.getElementById('table');
+      const wrapper = document.createElement('div');
+      wrapper.innerHTML = `<div>${playerId}</div>`;
+      const img = document.createElement('img');
+      img.src = card.img;
+      img.alt = card.name;
+      wrapper.appendChild(img);
+      table.appendChild(wrapper);
+    }
+
+    function removeCardFromHand(cardId) {
+      const imgs = document.querySelectorAll('#hand img');
+      imgs.forEach(img => {
+        if (img.dataset.cardId === cardId) img.remove();
+      });
+    }
+
+     function updateCurrentPlayer(currentId) {
+      const status = document.getElementById('status');
+      status.innerText = `Current turn: ${currentId}`;
+      // Highlight the player's name in playerList here
+    }
+
+    // For testing: a button to start the game (only visible to the first player normally)
+    const startBtn = document.createElement('button');
+    startBtn.innerText = 'Start Game';
+    startBtn.addEventListener('click', () => socket.emit('startGame', { gameId: 'default', handSize: 5 }));
+    document.body.appendChild(startBtn);
 </script>
 </html>
