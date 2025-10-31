@@ -61,6 +61,9 @@ io.on('connection', (socket) => {
     const game = games[gameId] || initGame(gameId);
     if (game.started) return;
     if (game.players.length === 0) return;
+    // validate hand size
+    handSize = Number(handSize) || 7;
+    if (handSize < 1) handSize = 1;
     // ensure deck is shuffled
     shuffle(game.deck);
     // deal
@@ -101,7 +104,7 @@ io.on('connection', (socket) => {
     //Handles putting a card down
     const [card] = player.hand.splice(cardIndex, 1);
     // Example: put card on table (we just broadcast the play)
-    io.to(gameId).emit('cardPlayed', { playerId: player.id, card });
+    io.to(gameId).emit('cardPlayed', { playerId: player.id, playerName: player.name, card });
     // Handles advancing turn
     game.turnIndex = (game.turnIndex + 1) % game.players.length;
     const nextPlayerId = game.players[game.turnIndex].id;

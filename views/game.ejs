@@ -67,8 +67,8 @@
         updateCurrentPlayer(currentPlayerId);
     });
 
-    socket.on('cardPlayed', ({ playerId, card }) => {
-        addCardToTable(card, playerId);
+    socket.on('cardPlayed', ({ playerId, playerName, card }) => {
+        addCardToTable(card, playerId, playerName);
         removeCardFromHand(card.id);
     });
 
@@ -93,10 +93,11 @@
       });
     }
 
-    function addCardToTable(card, playerId) {
+    function addCardToTable(card, playerId, playerName) {
       const table = document.getElementById('table');
       const wrapper = document.createElement('div');
-      wrapper.innerHTML = `<div>${playerId}</div>`;
+      const displayName = playerName || (document.getElementById('p_' + playerId)?.textContent) || playerId;
+      wrapper.innerHTML = `<div>${displayName}</div>`;
       const img = document.createElement('img');
       img.src = card.img;
       img.alt = card.name;
@@ -120,7 +121,7 @@
     // For testing: a button to start the game (only visible to the first player normally)
     const startBtn = document.createElement('button');
     startBtn.innerText = 'Start Game';
-    startBtn.addEventListener('click', () => socket.emit('startGame', { gameId: 'default', handSize: 5 }));
+    startBtn.addEventListener('click', () => socket.emit('startGame', { gameId: 'default', handSize: 7 }));
     document.body.appendChild(startBtn);
 </script>
 </html>
