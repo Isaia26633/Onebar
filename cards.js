@@ -28,18 +28,23 @@ function createDeck() {
             deck.push(makeCard(color, action, idx++));
             deck.push(makeCard(color, action, idx++));
         });
+        
     }
-
+    for (let i = 0; i < 4; i++) {
+        deck.push(makeCard('wild', 'Wild', idx++));
+        deck.push(makeCard('wild', 'Wild Draw Four', idx++));
+    }
     return deck;
 }
 
 function makeCard(color, value, uniqueIndex) {
-    const safeValue = value.replace(/\s+/g, '_'); //"Draw_Two" is proper filename
+    const safeValue = value.replace(/\s+/g, '_');
     const id = `${color}_${safeValue}_${uniqueIndex}`;
     return {
         id,
         color,
         value,
+        name: `${color} ${value}`,
         // this points to public/img/cards/<color>_<value>.png
         img: `/img/cards/${color}_${safeValue}.png`
     };

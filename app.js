@@ -8,6 +8,7 @@ const http = require('http');
 const server = http.createServer(app);
 const io = socketIO(server);
 const port = 3000
+// https://172.16.3.147:3000 is the url 
 
 const {createDeck, shuffle} = require('./cards');
 
@@ -32,10 +33,34 @@ function initGame(gameId = 'default') {
   games[gameId] = {
     players: [],
     deck,
+    discardPile: [],
     turnIndex: 0,
+    direction: 1, // 1 for clockwise, -1 for counter-clockwise
     started: false
   };
   return games[gameId];
+}
+
+// Draw cards from the deck, refilling from discard pile if needed
+function drawFromDeck(game, count = 1) {
+  const drawn = [];
+  for (let i = 0; i < count; i++) {
+    if (game.deck.length === 0) {
+      // Refill deck from discard pile, but keep the top card on the table
+      if (game.discardPile.length > 1) {
+        const top = game.discardPile.pop(); // removes the top, shuffles the rest, puts the top back
+        const rest = game.discardPile.splice(0);
+        game.deck = shuffle(rest);
+        game.discardPile = [top];
+      } else {
+        // No cards to draw
+        break;
+      }
+    }
+    if (game.deck.length === 0) break;
+    drawn.push(game.deck.pop());
+  }
+  return drawn;
 }
 
 io.on('connection', (socket) => {
@@ -71,6 +96,14 @@ io.on('connection', (socket) => {
       player.hand = game.deck.splice(0, handSize);
       io.to(player.socketId).emit('deal', player.hand);
     }
+    // Start discard pile with top card (if available)
+    if (game.deck.length > 0) {
+      const top = game.deck.pop();
+      game.discardPile = [top];
+      io.to(gameId).emit('cardPlacedOnTable', top);
+    } else {
+      game.discardPile = [];
+    }
     game.turnIndex = 0;
     game.started = true;
     const currentPlayerId = game.players[game.turnIndex].id;
@@ -103,8 +136,69 @@ io.on('connection', (socket) => {
     }
     //Handles putting a card down
     const [card] = player.hand.splice(cardIndex, 1);
-    // Example: put card on table (we just broadcast the play)
+    const topCard = game.discardPile.length > 0 ? game.discardPile[game.discardPile.length - 1] : null;
+    const topActiveColor = topCard ? (topCard.activeColor || topCard.color) : null;
+
+    // Make wilds playable anytime; otherwise gets matched by color/value
+    const isWild = card.color === 'wild';
+    const matchesColor = topActiveColor && card.color === topActiveColor;
+    const matchesValue = topCard && String(card.value) === String(topCard.value);
+    const isValidPlay = !topCard || isWild || matchesColor || matchesValue;
+    if (!isValidPlay) {
+      player.hand.push(card);
+      socket.emit('invalidMove', { reason: 'Card doesnt match color or value twin' });
+      return;
+    }
+
+    if (isWild) {
+      const allowed = ['red', 'green', 'blue', 'yellow'];
+      if (!chosenColor || !allowed.includes(String(chosenColor).toLowerCase())) {
+        chosenColor = 'red';
+      } else {
+        chosenColor = String(chosenColor).toLowerCase();
+      }
+      card.activeColor = chosenColor;
+    } else {
+      card.activeColor = card.color;
+    }
+
+    //discards and then plays
+    game.discardPile.push(card);
     io.to(gameId).emit('cardPlayed', { playerId: player.id, playerName: player.name, card });
+    
+    //determines direction
+    const playerCount = game.players.length;
+    const step = game.direction;
+    let nextIndex = ((playerIndex + step ) % playerCount + playerCount ) % playerCount;
+
+    // Handle special cards
+    const special = String(card.value).toLowerCase();
+    if (special === 'skip' || special === 'skip_2') {
+      nextIndex = ((nextIndex + step ) % playerCount + playerCount ) % playerCount;
+    } else if ( special === 'draw two' || special === 'draw_two' || special.includes('draw')) {
+      const victim = game.players[nextIndex];
+      const drawn = drawFromDeck(game, 2);
+      victim.hand.push(...drawn);
+      io.to(victim.socketId).emit('deal', victim.hand);
+      io.to(gameId).emit('playerDrewCards', { playerId: victim.id, count: drawn.length });
+      nextIndex = ((nextIndex + step ) % playerCount + playerCount ) % playerCount;
+    } else if (special === 'reverse') {
+      game.direction = -game.direction;
+      if (playerCount === 2) {
+        nextIndex = ((playerIndex + game.direction ) % playerCount + playerCount ) % playerCount;
+      } else {
+        //one step in new direction after reverse
+        nextIndex = ((playerIndex + game.direction ) % playerCount + playerCount ) % playerCount;
+      }
+    } else if (special === 'wild draw four' || special === 'wild_draw_four' || special.includes('draw four')) {
+      const victim = game.players[nextIndex];
+      const drawn = drawFromDeck(game, 4);
+      victim.hand.push(...drawn);
+      io.to(victim.socketId).emit('deal', victim.hand);
+      io.to(gameId).emit('playerDrew', { playerId: victim.id, count: drawn.length });
+      nextIndex = ((nextIndex + step ) % playerCount + playerCount ) % playerCount;
+    }
+  
     // Handles advancing turn
     game.turnIndex = (game.turnIndex + 1) % game.players.length;
     const nextPlayerId = game.players[game.turnIndex].id;

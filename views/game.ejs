@@ -82,12 +82,19 @@
       hand.forEach(card => {
         const img = document.createElement('img');
         img.src = card.img;
-        img.alt = card.name;
+        img.alt = card.name || card.value;
         img.dataset.cardId = card.id;
         img.title = `${card.name} (value ${card.value})`;
         img.addEventListener('click', () => {
           // play the card
-          socket.emit('playCard', { gameId: 'default', cardId: card.id });
+          if (card.color === 'wild') {
+            const chosen = prompt('Choose a color: red, blue, green, yellow');
+            const allowed = ['red', 'blue', 'green', 'yellow'];
+            const chosenColor = (chosen && allowed.includes(chosen.toLowerCase())) ? chosen.toLowerCase() : 'red';
+            socket.emit('playCard', { gameId: 'default', cardId: card.id, chosenColor });
+          } else {
+            socket.emit('playCard', { gameId: 'default', cardId: card.id });
+          }
         });
         container.appendChild(img);
       });
@@ -102,6 +109,11 @@
       img.src = card.img;
       img.alt = card.name;
       wrapper.appendChild(img);
+      if (card.chosenColor) {
+        const badge = document.createElement('div');
+        badge.innerText = `Color: ${card.chosenColor}`;
+        wrapper.appendChild(badge);
+      }
       table.appendChild(wrapper);
     }
 
@@ -112,9 +124,10 @@
       });
     }
 
-     function updateCurrentPlayer(currentId) {
+     function updateCurrentPlayer(currentId, playerName) {
       const status = document.getElementById('status');
-      status.innerText = `Current turn: ${currentId}`;
+      const displayName = playerName || (document.getElementById('p_' + currentId)?.textContent) || currentId;
+      status.innerText = `Current turn: ${displayName || currentId}`;
       // Highlight the player's name in playerList here
     }
 
@@ -123,5 +136,6 @@
     startBtn.innerText = 'Start Game';
     startBtn.addEventListener('click', () => socket.emit('startGame', { gameId: 'default', handSize: 7 }));
     document.body.appendChild(startBtn);
+    //what do I need to do on the game page to make the starting top card show up on the table, also make it so instead of just keep adding to a list it just replaces the card that was there before. Also can you give me an example of what the file name should look like for the wilds and wild draw 4's
 </script>
 </html>
