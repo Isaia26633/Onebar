@@ -8,7 +8,7 @@ const http = require('http');
 const server = http.createServer(app);
 const io = socketIO(server);
 const port = 3000
-// https://172.16.3.147:3000 is the url 
+// 172.16.3.147:3000 is the url for others at the moment
 
 const {createDeck, shuffle} = require('./cards');
 
@@ -25,7 +25,7 @@ app.get('/game', (req, res) => {
   res.render('game.ejs')
 });
 
-const games = {}; // { [gameId]: { players: [{ socketId, id, name, hand: [] }], deck: [], turnIndex: 0 } }
+const games = {};// { [gameId]: { players: [{ socketId, id, name, hand: [] }], deck: [], turnIndex: 0 } }
 
 function initGame(gameId = 'default') {
   const deck = createDeck();
@@ -112,7 +112,7 @@ io.on('connection', (socket) => {
   });
 
   //Handles playing a card
-  socket.on('playCard', ({ gameId = 'default', cardId }) => {
+  socket.on('playCard', ({ gameId = 'default', cardId, chosenColor } = {}) => {
     const game = games[gameId];
     if (!game || !game.started) {
       socket.emit('invalidMove', { reason: 'Game not started' });

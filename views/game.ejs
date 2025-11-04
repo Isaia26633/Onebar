@@ -67,6 +67,10 @@
         updateCurrentPlayer(currentPlayerId);
     });
 
+    socket.on('cardPlacedOnTable', (card) => {
+      addCardToTable(card, null, 'Top of Discard Pile');
+    });
+
     socket.on('cardPlayed', ({ playerId, playerName, card }) => {
         addCardToTable(card, playerId, playerName);
         removeCardFromHand(card.id);
@@ -102,18 +106,35 @@
 
     function addCardToTable(card, playerId, playerName) {
       const table = document.getElementById('table');
+      //clear other cards only show top
+      table.innerHTML = '';
+
       const wrapper = document.createElement('div');
+      wrapper.style.display = 'inline-block';
+      wrapper.style.textAlign = 'center';
+      wrapper.style.margin = '8px';
+
       const displayName = playerName || (document.getElementById('p_' + playerId)?.textContent) || playerId;
-      wrapper.innerHTML = `<div>${displayName}</div>`;
+      const who = document.createElement('div');
+      who.innerText = displayName;
+      who.style.marginBottom = '4px';
+      wrapper.appendChild(who);
+
       const img = document.createElement('img');
       img.src = card.img;
-      img.alt = card.name;
+      img.alt = card.name || card.value;
+      img.style.width = '120px';
       wrapper.appendChild(img);
-      if (card.chosenColor) {
+
+      const active = card.activeColor || card.chosenColor;
+      if (active) {
         const badge = document.createElement('div');
-        badge.innerText = `Color: ${card.chosenColor}`;
+        badge.innerText = `Color: ${active}`;
+        badge.style.marginTop = '6px';
+        badge.style.fontWeight = '600';
         wrapper.appendChild(badge);
       }
+
       table.appendChild(wrapper);
     }
 
@@ -136,6 +157,5 @@
     startBtn.innerText = 'Start Game';
     startBtn.addEventListener('click', () => socket.emit('startGame', { gameId: 'default', handSize: 7 }));
     document.body.appendChild(startBtn);
-    //what do I need to do on the game page to make the starting top card show up on the table, also make it so instead of just keep adding to a list it just replaces the card that was there before. Also can you give me an example of what the file name should look like for the wilds and wild draw 4's
 </script>
 </html>
