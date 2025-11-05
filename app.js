@@ -100,15 +100,113 @@ io.on('connection', (socket) => {
     if (game.deck.length > 0) {
       const top = game.deck.pop();
       game.discardPile = [top];
-      io.to(gameId).emit('cardPlacedOnTable', top);
     } else {
       game.discardPile = [];
     }
+
+    //remaining draw pile count
+    io.to(gameId).emit('drawPileCount', { count: game.deck.length });
+
     game.turnIndex = 0;
-    game.started = true;
+
     const currentPlayerId = game.players[game.turnIndex].id;
     io.to(gameId).emit('gameStarted', { currentPlayerId, players: game.players.map(p => ({ id: p.id, name: p.name })) });
+
+    if (game.discardPile.length > 0) {
+      const top = game.discardPile[game.discardPile.length - 1];
+      
+      io.to(gameId).emit('cardPlacedOnTable', top);
+
+      if (top.color === 'wild') {
+        const currentSocketId = game.players[game.turnIndex].socketId;
+        io.to(currentSocketId).emit('requestStartColor', { gameId, card: top});
+        io.to(gameId).emit('cardPlacedOnTable', top);
+        console.log('requesting starting color', currentSocketId);
+      } else {
+        game.started = true;
+      }
+    } else {
+      game.started = true;
+    }
+
     console.log('game started', gameId);
+  });
+
+  socket.on('drawCard', ({gameId = 'default', count = 1} = {}) => {
+    const game = games[gameId];
+    if (!game || !game.started) {
+      socket.emit('invalidMove', { reason: 'Game not started' });
+      return;
+    }
+    const playerIndex = game.players.findIndex(p => p.socketId === socket.id);
+    if (playerIndex === -1) {
+      socket.emit('invalidMove', { reason: 'Not in game' });
+      return;
+    }
+    if (playerIndex !== game.turnIndex) {
+      socket.emit('invalidMove', { reason: 'Not your turn' });
+      return;
+    }
+    //draw
+    const drawn = drawFromDeck(game, 1);
+    if (!drawn || drawn.length === 0) {
+      socket.emit('invalidMove', { reason: 'No cards left to draw' });
+      return;
+    }
+
+    const player = game.players[playerIndex];
+    player.hand.push(...drawn);
+
+    //send updated hand
+    io.to(player.socketId).emit('deal', player.hand);
+
+    //notify others
+    io.to(gameId).emit('playerDrew', { playerId: player.id, count: drawn.length });
+
+    //remaining draw pile count
+    io.to(gameId).emit('drawPileCount', { count: game.deck.length });
+
+    //advance turn
+    const playerCount = game.players.length;
+    const step = game.direction;
+    const nextIndex = ((game.turnIndex + step ) % playerCount + playerCount ) % playerCount;
+    game.turnIndex = nextIndex;
+
+    const nextPlayerId = game.players[game.turnIndex].id;
+    io.to(gameId).emit('turnChanged', { currentPlayerId: nextPlayerId });
+  });
+
+    // Receive the chosen start color from the player who was asked
+  socket.on('startColorChosen', ({ gameId = 'default', color } = {}) => {
+    const game = games[gameId];
+    if (!game) return;
+    // ensure there's a top card and it's a wild without activeColor
+    if (!game.discardPile || game.discardPile.length === 0) return;
+    const top = game.discardPile[game.discardPile.length - 1];
+    if (top.color !== 'wild' || top.activeColor) return;
+
+    // only the current player should be allowed to choose the start color
+    const currentPlayer = game.players[game.turnIndex];
+    if (!currentPlayer || currentPlayer.socketId !== socket.id) {
+      socket.emit('invalidMove', { reason: 'Not authorized to choose start color' });
+      return;
+    }
+
+    const allowed = ['red', 'green', 'blue', 'yellow'];
+    if (!color || !allowed.includes(String(color).toLowerCase())) {
+      color = 'red';
+    } else {
+      color = String(color).toLowerCase();
+    }
+
+    top.activeColor = color;
+    game.started = true;
+
+    // Broadcast updated top card and keep the turn with the chooser
+    io.to(gameId).emit('cardPlacedOnTable', top);
+    io.to(gameId).emit('turnChanged', { currentPlayerId: currentPlayer.id });
+
+    console.log(`Start color chosen for game ${gameId}: ${color}`);
   });
 
   //Handles playing a card
@@ -185,7 +283,7 @@ io.on('connection', (socket) => {
     } else if (special === 'reverse') {
       game.direction = -game.direction;
       if (playerCount === 2) {
-        nextIndex = ((playerIndex + game.direction ) % playerCount + playerCount ) % playerCount;
+        nextIndex = playerIndex; // in 2-player game, reverse acts like skip
       } else {
         //one step in new direction after reverse
         nextIndex = ((playerIndex + game.direction ) % playerCount + playerCount ) % playerCount;
@@ -198,11 +296,15 @@ io.on('connection', (socket) => {
       io.to(gameId).emit('playerDrew', { playerId: victim.id, count: drawn.length });
       nextIndex = ((nextIndex + step ) % playerCount + playerCount ) % playerCount;
     }
-  
+
     // Handles advancing turn
-    game.turnIndex = (game.turnIndex + 1) % game.players.length;
+    game.turnIndex = nextIndex;
+
     const nextPlayerId = game.players[game.turnIndex].id;
     io.to(gameId).emit('turnChanged', { currentPlayerId: nextPlayerId });
+
+    // after any draw-from-deck call inside playCard, add:
+    io.to(gameId).emit('drawPileCount', { count: game.deck.length });
   });
 
     socket.on('disconnect', () => {

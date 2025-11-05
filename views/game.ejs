@@ -21,6 +21,21 @@
         .current {
             font-weight: bold;
         }
+             #tableArea {
+            display: flex;
+            align-items: center;
+            gap: 20px; /* space between draw pile and discard */
+            margin-top: 8px;
+        }
+        #drawPile {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        #table {
+            display: flex;
+            align-items: center;
+        }
     </style>
 </head>
 <body>
@@ -33,6 +48,9 @@
     <div id="hand"></div>
 
     <h3>Table</h3>
+     <div id="tableArea"></div>
+      <div id="drawPilePlaceholder"></div>
+      
     <div id="table"></div>
 
     <script src="/socket.io/socket.io.js"></script>
@@ -78,6 +96,15 @@
 
     socket.on('invalidMove', ({ reason }) => {
         alert('Invalid move: ' + reason);
+    });
+
+      // only the player who receives this should be prompted (server sends to one socket)
+        socket.on('requestStartColor', ({ gameId: gid, card }) => {
+        const allowed = ['red', 'blue', 'green', 'yellow'];
+        let chosen = prompt('The starting card is a Wild. Choose the starting color: red, blue, green, yellow');
+        chosen = chosen ? chosen.toLowerCase() : 'red';
+        if (!allowed.includes(chosen)) chosen = 'red';
+        socket.emit('startColorChosen', { gameId: gid || 'default', color: chosen });
     });
 
     function renderHand(hand) {
@@ -157,5 +184,53 @@
     startBtn.innerText = 'Start Game';
     startBtn.addEventListener('click', () => socket.emit('startGame', { gameId: 'default', handSize: 7 }));
     document.body.appendChild(startBtn);
+
+    // ...existing code in <script>...
+
+// Create draw pile UI (card back image + count)
+const drawContainer = document.createElement('div');
+drawContainer.id = 'drawPile';
+drawContainer.style.display = 'inline-block';
+drawContainer.style.textAlign = 'center';
+drawContainer.style.margin = '8px';
+
+// draw pile image
+const drawImg = document.createElement('img');
+drawImg.id = 'drawPileImg';
+drawImg.src = '/img/cards/card_Back.png';
+drawImg.alt = 'Draw Pile';
+drawImg.style.width = '120px';
+drawImg.style.cursor = 'pointer';
+drawContainer.appendChild(drawImg);
+
+// count badge
+const drawCount = document.createElement('div');
+drawCount.id = 'drawCount';
+drawCount.style.marginTop = '6px';
+drawCount.style.fontWeight = '600';
+drawCount.innerText = ''; 
+drawContainer.appendChild(drawCount);
+
+// Place the draw pile near the table
+const tableEl = document.getElementById('table');
+tableEl.parentNode.insertBefore(drawContainer, tableEl);
+
+// Clicking the draw pile
+drawImg.addEventListener('click', () => {
+  socket.emit('drawCard', { gameId: 'default' });
+});
+
+// Update draw pile count when server tells us
+socket.on('drawPileCount', ({ count }) => {
+  const el = document.getElementById('drawCount');
+  el.innerText = `Deck: ${count}`;
+});
+
+// Optionally show a notification when any player draws
+socket.on('playerDrew', ({ playerId, count }) => {
+  const name = document.getElementById('p_' + playerId)?.textContent || playerId;
+  const s = document.getElementById('status');
+  s.innerText = `${name} drew ${count} card${count !== 1 ? 's' : ''}`;
+});
 </script>
 </html>
