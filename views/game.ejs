@@ -5,232 +5,203 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Onebar - Game</title>
     <link rel="stylesheet" href="/css/theme.css">
-    <style>
-        #hand img {
-            width: 100px;
-            margin: 5px;
-            cursor: pointer;
-        }
-        #table img {
-            width: 120px;
-            margin: 5px;
-        }
-        #playerList {
-            margin-bottom: 10px;
-        }
-        .current {
-            font-weight: bold;
-        }
-             #tableArea {
-            display: flex;
-            align-items: center;
-            gap: 20px; /* space between draw pile and discard */
-            margin-top: 8px;
-        }
-        #drawPile {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        #table {
-            display: flex;
-            align-items: center;
-        }
-    </style>
+    <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
-    <h1>Game</h1>
+    <div class="game-container">
+        <div class="game-header">
+            <h1>Uno Game</h1>
+        </div>
 
-    <div id="playerList"></div>
-    <div id="status"></div>
+        <div id="playerList"></div>
+        <div id="status"></div>
 
-    <h3>Your Hand</h3>
-    <div id="hand"></div>
+        <div class="hand-section">
+            <h3>Your Hand</h3>
+            <div id="hand"></div>
+        </div>
 
-    <h3>Table</h3>
-     <div id="tableArea"></div>
-      <div id="drawPilePlaceholder"></div>
-      
-    <div id="table"></div>
+        <div class="table-section">
+            <h3>Game Table</h3>
+            <div id="tableArea">
+                <div id="drawPile">
+                    <img id="drawPileImg" src="/img/cards/card_Back.png" alt="Draw Pile">
+                    <div id="drawCount"></div>
+                </div>
+                <div id="table"></div>
+            </div>
+        </div>
+
+        <div class="game-controls">
+            <button id="startGameBtn" class="start-game-btn">Start Game</button>
+        </div>
+    </div>
 
     <script src="/socket.io/socket.io.js"></script>
     <script src="/js/theme.js"></script>
-</body>
-<script>
-    const socket = io();
+    <script>
+        const socket = io();
 
-    const playerName = prompt('Enter your name', 'Player') || 'Player';
+        const playerName = prompt('Enter your name', 'Player') || 'Player';
 
-    socket.emit('joinGame', { playerName, gameId: 'default' });
+        socket.emit('joinGame', { playerName, gameId: 'default' });
 
-    socket.on('joined', ({ playerId, gameId }) => {
-        console.log('joined', playerId, gameId);
-        document.getElementById('status').innerText = `Joined game ${gameId} as ${playerName}`;
-    });
-
-    socket.on('playerList', (players) => {
-        const el = document.getElementById('playerList');
-        el.innerHTML = 'Players:' + players.map(p => `<span id="p_${p.id}">${p.name}</span>`).join(' | ');
-    });
-    socket.on('deal', (hand) => {
-        renderHand(hand);
-        console.log('received deal', hand);
-    });
-    
-    socket.on('gameStarted', ({currentPlayerId, players}) => {
-        updateCurrentPlayer(currentPlayerId);
-    });
-
-    socket.on('turnChanged', ({ currentPlayerId }) => {
-        updateCurrentPlayer(currentPlayerId);
-    });
-
-    socket.on('cardPlacedOnTable', (card) => {
-      addCardToTable(card, null, 'Top of Discard Pile');
-    });
-
-    socket.on('cardPlayed', ({ playerId, playerName, card }) => {
-        addCardToTable(card, playerId, playerName);
-        removeCardFromHand(card.id);
-    });
-
-    socket.on('invalidMove', ({ reason }) => {
-        alert('Invalid move: ' + reason);
-    });
-
-      // only the player who receives this should be prompted (server sends to one socket)
-        socket.on('requestStartColor', ({ gameId: gid, card }) => {
-        const allowed = ['red', 'blue', 'green', 'yellow'];
-        let chosen = prompt('The starting card is a Wild. Choose the starting color: red, blue, green, yellow');
-        chosen = chosen ? chosen.toLowerCase() : 'red';
-        if (!allowed.includes(chosen)) chosen = 'red';
-        socket.emit('startColorChosen', { gameId: gid || 'default', color: chosen });
-    });
-
-    function renderHand(hand) {
-      const container = document.getElementById('hand');
-      container.innerHTML = '';
-      hand.forEach(card => {
-        const img = document.createElement('img');
-        img.src = card.img;
-        img.alt = card.name || card.value;
-        img.dataset.cardId = card.id;
-        img.title = `${card.name} (value ${card.value})`;
-        img.addEventListener('click', () => {
-          // play the card
-          if (card.color === 'wild') {
-            const chosen = prompt('Choose a color: red, blue, green, yellow');
-            const allowed = ['red', 'blue', 'green', 'yellow'];
-            const chosenColor = (chosen && allowed.includes(chosen.toLowerCase())) ? chosen.toLowerCase() : 'red';
-            socket.emit('playCard', { gameId: 'default', cardId: card.id, chosenColor });
-          } else {
-            socket.emit('playCard', { gameId: 'default', cardId: card.id });
-          }
+        socket.on('joined', ({ playerId, gameId }) => {
+            console.log('joined', playerId, gameId);
+            document.getElementById('status').innerText = `Joined game ${gameId} as ${playerName}`;
         });
-        container.appendChild(img);
-      });
-    }
 
-    function addCardToTable(card, playerId, playerName) {
-      const table = document.getElementById('table');
-      //clear other cards only show top
-      table.innerHTML = '';
+        socket.on('playerList', (players) => {
+            const el = document.getElementById('playerList');
+            el.innerHTML = 'Players: ' + players.map(p => `<span id="p_${p.id}">${p.name}</span>`).join(' | ');
+        });
 
-      const wrapper = document.createElement('div');
-      wrapper.style.display = 'inline-block';
-      wrapper.style.textAlign = 'center';
-      wrapper.style.margin = '8px';
+        socket.on('deal', (hand) => {
+            renderHand(hand);
+            console.log('received deal', hand);
+        });
+        
+        socket.on('gameStarted', ({currentPlayerId, players}) => {
+            updateCurrentPlayer(currentPlayerId);
+        });
 
-      const displayName = playerName || (document.getElementById('p_' + playerId)?.textContent) || playerId;
-      const who = document.createElement('div');
-      who.innerText = displayName;
-      who.style.marginBottom = '4px';
-      wrapper.appendChild(who);
+        socket.on('turnChanged', ({ currentPlayerId }) => {
+            updateCurrentPlayer(currentPlayerId);
+        });
 
-      const img = document.createElement('img');
-      img.src = card.img;
-      img.alt = card.name || card.value;
-      img.style.width = '120px';
-      wrapper.appendChild(img);
+        socket.on('cardPlacedOnTable', (card) => {
+          addCardToTable(card, null, 'Top of Discard Pile');
+        });
 
-      const active = card.activeColor || card.chosenColor;
-      if (active) {
-        const badge = document.createElement('div');
-        badge.innerText = `Color: ${active}`;
-        badge.style.marginTop = '6px';
-        badge.style.fontWeight = '600';
-        wrapper.appendChild(badge);
-      }
+        socket.on('cardPlayed', ({ playerId, playerName, card }) => {
+            addCardToTable(card, playerId, playerName);
+            removeCardFromHand(card.id);
+        });
 
-      table.appendChild(wrapper);
-    }
+        socket.on('invalidMove', ({ reason }) => {
+            showNotification('Invalid move: ' + reason, 'error');
+        });
 
-    function removeCardFromHand(cardId) {
-      const imgs = document.querySelectorAll('#hand img');
-      imgs.forEach(img => {
-        if (img.dataset.cardId === cardId) img.remove();
-      });
-    }
+        // Only the player who receives this should be prompted (server sends to one socket)
+        socket.on('requestStartColor', ({ gameId: gid, card }) => {
+            const allowed = ['red', 'blue', 'green', 'yellow'];
+            let chosen = prompt('The starting card is a Wild. Choose the starting color: red, blue, green, yellow');
+            chosen = chosen ? chosen.toLowerCase() : 'red';
+            if (!allowed.includes(chosen)) chosen = 'red';
+            socket.emit('startColorChosen', { gameId: gid || 'default', color: chosen });
+        });
 
-     function updateCurrentPlayer(currentId, playerName) {
-      const status = document.getElementById('status');
-      const displayName = playerName || (document.getElementById('p_' + currentId)?.textContent) || currentId;
-      status.innerText = `Current turn: ${displayName || currentId}`;
-      // Highlight the player's name in playerList here
-    }
+        function renderHand(hand) {
+          const container = document.getElementById('hand');
+          container.innerHTML = '';
+          hand.forEach(card => {
+            const img = document.createElement('img');
+            img.src = card.img;
+            img.alt = card.name || card.value;
+            img.dataset.cardId = card.id;
+            img.title = `${card.name} (value ${card.value})`;
+            img.classList.add('card-entering');
+            img.addEventListener('click', () => {
+              // Play the card
+              if (card.color === 'wild') {
+                const chosen = prompt('Choose a color: red, blue, green, yellow');
+                const allowed = ['red', 'blue', 'green', 'yellow'];
+                const chosenColor = (chosen && allowed.includes(chosen.toLowerCase())) ? chosen.toLowerCase() : 'red';
+                socket.emit('playCard', { gameId: 'default', cardId: card.id, chosenColor });
+              } else {
+                socket.emit('playCard', { gameId: 'default', cardId: card.id });
+              }
+            });
+            container.appendChild(img);
+          });
+        }
 
-    // For testing: a button to start the game (only visible to the first player normally)
-    const startBtn = document.createElement('button');
-    startBtn.innerText = 'Start Game';
-    startBtn.addEventListener('click', () => socket.emit('startGame', { gameId: 'default', handSize: 7 }));
-    document.body.appendChild(startBtn);
+        function addCardToTable(card, playerId, playerName) {
+          const table = document.getElementById('table');
+          // Clear other cards only show top
+          table.innerHTML = '';
 
-    // ...existing code in <script>...
+          const wrapper = document.createElement('div');
 
-// Create draw pile UI (card back image + count)
-const drawContainer = document.createElement('div');
-drawContainer.id = 'drawPile';
-drawContainer.style.display = 'inline-block';
-drawContainer.style.textAlign = 'center';
-drawContainer.style.margin = '8px';
+          const displayName = playerName || (document.getElementById('p_' + playerId)?.textContent) || playerId;
+          const who = document.createElement('div');
+          who.innerText = displayName;
+          wrapper.appendChild(who);
 
-// draw pile image
-const drawImg = document.createElement('img');
-drawImg.id = 'drawPileImg';
-drawImg.src = '/img/cards/card_Back.png';
-drawImg.alt = 'Draw Pile';
-drawImg.style.width = '120px';
-drawImg.style.cursor = 'pointer';
-drawContainer.appendChild(drawImg);
+          const img = document.createElement('img');
+          img.src = card.img;
+          img.alt = card.name || card.value;
+          wrapper.appendChild(img);
 
-// count badge
-const drawCount = document.createElement('div');
-drawCount.id = 'drawCount';
-drawCount.style.marginTop = '6px';
-drawCount.style.fontWeight = '600';
-drawCount.innerText = ''; 
-drawContainer.appendChild(drawCount);
+          const active = card.activeColor || card.chosenColor;
+          if (active) {
+            const badge = document.createElement('div');
+            badge.innerText = `Color: ${active}`;
+            wrapper.appendChild(badge);
+          }
 
-// Place the draw pile near the table
-const tableEl = document.getElementById('table');
-tableEl.parentNode.insertBefore(drawContainer, tableEl);
+          table.appendChild(wrapper);
+        }
 
-// Clicking the draw pile
-drawImg.addEventListener('click', () => {
-  socket.emit('drawCard', { gameId: 'default' });
-});
+        function removeCardFromHand(cardId) {
+          const imgs = document.querySelectorAll('#hand img');
+          imgs.forEach(img => {
+            if (img.dataset.cardId === cardId) {
+              img.classList.add('card-leaving');
+              setTimeout(() => img.remove(), 300);
+            }
+          });
+        }
 
-// Update draw pile count when server tells us
-socket.on('drawPileCount', ({ count }) => {
-  const el = document.getElementById('drawCount');
-  el.innerText = `Deck: ${count}`;
-});
+        function updateCurrentPlayer(currentId, playerName) {
+          const status = document.getElementById('status');
+          const displayName = playerName || (document.getElementById('p_' + currentId)?.textContent) || currentId;
+          status.innerText = `Current turn: ${displayName || currentId}`;
+          
+          // Update player list highlighting
+          document.querySelectorAll('#playerList span').forEach(span => {
+            span.classList.remove('current');
+          });
+          const currentPlayerSpan = document.getElementById('p_' + currentId);
+          if (currentPlayerSpan) {
+            currentPlayerSpan.classList.add('current');
+          }
+        }
 
-// Optionally show a notification when any player draws
-socket.on('playerDrew', ({ playerId, count }) => {
-  const name = document.getElementById('p_' + playerId)?.textContent || playerId;
-  const s = document.getElementById('status');
-  s.innerText = `${name} drew ${count} card${count !== 1 ? 's' : ''}`;
-});
-</script>
+        function showNotification(message, type = 'success') {
+          const notification = document.createElement('div');
+          notification.className = `notification ${type}`;
+          notification.textContent = message;
+          document.body.appendChild(notification);
+          
+          setTimeout(() => {
+            notification.remove();
+          }, 3000);
+        }
+
+        // Initialize draw pile
+        const drawImg = document.getElementById('drawPileImg');
+        drawImg.addEventListener('click', () => {
+          socket.emit('drawCard', { gameId: 'default' });
+        });
+
+        // Update draw pile count when server tells us
+        socket.on('drawPileCount', ({ count }) => {
+          const el = document.getElementById('drawCount');
+          el.innerText = `Deck: ${count}`;
+        });
+
+        // Show notification when any player draws
+        socket.on('playerDrew', ({ playerId, count }) => {
+          const name = document.getElementById('p_' + playerId)?.textContent || playerId;
+          showNotification(`${name} drew ${count} card${count !== 1 ? 's' : ''}`, 'success');
+        });
+
+        // Start game button
+        const startBtn = document.getElementById('startGameBtn');
+        startBtn.addEventListener('click', () => {
+          socket.emit('startGame', { gameId: 'default', handSize: 7 });
+        });
+    </script>
+</body>
 </html>

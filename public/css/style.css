@@ -1,0 +1,444 @@
+/* Uno Game Specific Styles */
+
+/* Game Layout */
+.game-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.game-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.game-header h1 {
+    color: var(--primary-color);
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+    text-shadow: 2px 2px 4px var(--shadow);
+}
+
+/* Player Information */
+#playerList {
+    background: var(--card-bg);
+    border: 2px solid var(--border-color);
+    border-radius: 12px;
+    padding: 15px;
+    margin-bottom: 20px;
+    text-align: center;
+    font-size: 1.1rem;
+    box-shadow: 0 4px 8px var(--shadow);
+}
+
+#playerList span {
+    display: inline-block;
+    padding: 5px 12px;
+    margin: 0 5px;
+    background: var(--hover-color);
+    border-radius: 20px;
+    transition: all 0.3s ease;
+}
+
+#playerList span.current {
+    font-weight: bold;
+    background: var(--primary-color);
+    color: white;
+    transform: scale(1.1);
+    box-shadow: 0 2px 8px var(--shadow);
+}
+
+/* Game Status */
+#status {
+    background: var(--primary-color);
+    color: white;
+    padding: 12px 20px;
+    border-radius: 25px;
+    text-align: center;
+    font-weight: bold;
+    font-size: 1.2rem;
+    margin-bottom: 25px;
+    box-shadow: 0 4px 12px var(--shadow);
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.02); }
+    100% { transform: scale(1); }
+}
+
+/* Hand Section */
+.hand-section {
+    margin: 30px 0;
+}
+
+.hand-section h3 {
+    color: var(--primary-color);
+    margin-bottom: 15px;
+    font-size: 1.5rem;
+    text-align: center;
+}
+
+#hand {
+    background: var(--card-bg);
+    border: 3px dashed var(--border-color);
+    border-radius: 15px;
+    padding: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    min-height: 140px;
+    box-shadow: inset 0 2px 8px var(--shadow);
+}
+
+#hand img {
+    width: 100px;
+    height: auto;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 8px var(--shadow);
+    border: 2px solid transparent;
+}
+
+#hand img:hover {
+    transform: translateY(-10px) scale(1.05);
+    box-shadow: 0 8px 20px var(--shadow);
+    border-color: var(--primary-color);
+    filter: brightness(1.1);
+}
+
+#hand img:active {
+    transform: translateY(-5px) scale(1.02);
+}
+
+/* Table Section */
+.table-section {
+    margin: 30px 0;
+}
+
+.table-section h3 {
+    color: var(--primary-color);
+    margin-bottom: 15px;
+    font-size: 1.5rem;
+    text-align: center;
+}
+
+#tableArea {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 40px;
+    margin: 20px 0;
+    padding: 20px;
+    background: var(--card-bg);
+    border-radius: 20px;
+    box-shadow: 0 6px 16px var(--shadow);
+}
+
+/* Draw Pile */
+#drawPile {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: var(--hover-color);
+    padding: 15px;
+    border-radius: 15px;
+    border: 2px solid var(--border-color);
+    transition: all 0.3s ease;
+}
+
+#drawPile:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px var(--shadow);
+    border-color: var(--accent-color);
+}
+
+#drawPileImg {
+    width: 120px;
+    height: auto;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px var(--shadow);
+}
+
+#drawPileImg:hover {
+    transform: scale(1.1);
+    filter: brightness(1.1);
+}
+
+#drawCount {
+    margin-top: 8px;
+    font-weight: 600;
+    color: var(--text-color);
+    background: var(--primary-color);
+    color: white;
+    padding: 4px 12px;
+    border-radius: 15px;
+    font-size: 0.9rem;
+}
+
+/* Discard Pile */
+#table {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--hover-color);
+    padding: 15px;
+    border-radius: 15px;
+    border: 2px solid var(--border-color);
+    min-width: 180px;
+    min-height: 180px;
+}
+
+#table > div {
+    display: inline-block;
+    text-align: center;
+    margin: 8px;
+    background: var(--card-bg);
+    padding: 12px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px var(--shadow);
+    border: 2px solid var(--border-color);
+}
+
+#table img {
+    width: 120px;
+    height: auto;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px var(--shadow);
+    transition: transform 0.3s ease;
+}
+
+#table img:hover {
+    transform: scale(1.05);
+}
+
+/* Player names above cards */
+#table > div > div:first-child {
+    margin-bottom: 8px;
+    font-weight: bold;
+    color: var(--primary-color);
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* Color indicator */
+#table > div > div:last-child {
+    margin-top: 8px;
+    font-weight: 600;
+    background: var(--accent-color);
+    color: white;
+    padding: 4px 8px;
+    border-radius: 10px;
+    font-size: 0.8rem;
+    display: inline-block;
+}
+
+/* Game Controls */
+.game-controls {
+    text-align: center;
+    margin: 30px 0;
+}
+
+.start-game-btn {
+    background: linear-gradient(135deg, var(--accent-color), var(--primary-color));
+    color: white;
+    border: none;
+    padding: 15px 30px;
+    border-radius: 25px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px var(--shadow);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.start-game-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px var(--shadow);
+    filter: brightness(1.1);
+}
+
+.start-game-btn:active {
+    transform: translateY(-1px);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .game-container {
+        padding: 10px;
+    }
+    
+    .game-header h1 {
+        font-size: 2rem;
+    }
+    
+    #tableArea {
+        flex-direction: column;
+        gap: 20px;
+    }
+    
+    #hand {
+        padding: 15px;
+    }
+    
+    #hand img {
+        width: 80px;
+    }
+    
+    #drawPileImg,
+    #table img {
+        width: 100px;
+    }
+    
+    #playerList {
+        font-size: 0.9rem;
+    }
+    
+    #playerList span {
+        display: block;
+        margin: 5px 0;
+    }
+}
+
+@media (max-width: 480px) {
+    #hand img {
+        width: 70px;
+    }
+    
+    #drawPileImg,
+    #table img {
+        width: 90px;
+    }
+    
+    .start-game-btn {
+        width: 100%;
+        padding: 12px;
+    }
+}
+
+/* Loading and transition effects */
+.card-entering {
+    animation: cardEnter 0.5s ease-out;
+}
+
+.card-leaving {
+    animation: cardLeave 0.3s ease-in;
+}
+
+@keyframes cardEnter {
+    from {
+        opacity: 0;
+        transform: translateY(20px) rotate(5deg);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) rotate(0deg);
+    }
+}
+
+@keyframes cardLeave {
+    from {
+        opacity: 1;
+        transform: scale(1);
+    }
+    to {
+        opacity: 0;
+        transform: scale(0.8) rotate(-5deg);
+    }
+}
+
+/* Color picker modal styles */
+.color-picker-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.color-picker-content {
+    background: var(--card-bg);
+    padding: 30px;
+    border-radius: 20px;
+    text-align: center;
+    box-shadow: 0 10px 30px var(--shadow);
+    border: 2px solid var(--border-color);
+}
+
+.color-picker-content h3 {
+    margin-bottom: 20px;
+    color: var(--primary-color);
+}
+
+.color-options {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.color-option {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    border: 3px solid white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 8px var(--shadow);
+}
+
+.color-option:hover {
+    transform: scale(1.1);
+    border-color: var(--primary-color);
+}
+
+.color-option.red { background: #ff4444; }
+.color-option.blue { background: #4444ff; }
+.color-option.green { background: #44ff44; }
+.color-option.yellow { background: #ffff44; }
+
+/* Game notifications */
+.notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: var(--accent-color);
+    color: white;
+    padding: 15px 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px var(--shadow);
+    z-index: 1001;
+    animation: slideIn 0.3s ease-out;
+}
+
+.notification.error {
+    background: #ff4444;
+}
+
+.notification.success {
+    background: var(--accent-color);
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
